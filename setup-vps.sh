@@ -76,12 +76,12 @@ cat > ~/dashboard-suporte/.env << EOF
 # Configurações de Produção - Dashboard de Suporte
 SECRET_KEY=$SECRET_KEY
 
-# PostgreSQL - CONFIGURE COM SEUS DADOS REAIS
-POSTGRES_HOST=localhost
+# PostgreSQL - Supabase (já configurado)
+POSTGRES_HOST=db.shfgplhdwwgdgltorren.supabase.co
 POSTGRES_PORT=5432
-POSTGRES_DB=dashboard_suporte
+POSTGRES_DB=postgres
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=SUA_SENHA_AQUI
+POSTGRES_PASSWORD=M@e92634664
 
 # Flask
 FLASK_ENV=production

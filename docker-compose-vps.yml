@@ -10,12 +10,12 @@ services:
       # IMPORTANTE: Altere esta chave secreta para uma chave forte e única!
       - SECRET_KEY=dashboard-suporte-2025-chave-super-secreta-mude-isso
       
-      # Configurações do PostgreSQL (você precisa fornecer os dados reais)
-      - POSTGRES_HOST=localhost  # Altere para seu servidor PostgreSQL
+      # Configurações do PostgreSQL (Supabase)
+      - POSTGRES_HOST=db.shfgplhdwwgdgltorren.supabase.co
       - POSTGRES_PORT=5432
-      - POSTGRES_DB=dashboard_suporte
-      - POSTGRES_USER=postgres   # Altere para seu usuário
-      - POSTGRES_PASSWORD=sua_senha_aqui  # Altere para sua senha
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=M@e92634664
       
       # Configurações da aplicação
       - FLASK_ENV=production

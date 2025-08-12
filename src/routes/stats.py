@@ -99,10 +99,10 @@ def get_dashboard_stats(current_user):
             
             # Finalizados hoje
             cursor.execute("""
-                SELECT COUNT(*) as count FROM tickets 
+                SELECT * FROM tickets 
                 WHERE status = 'completed' AND DATE(completed_at) = CURRENT_DATE
             """)
-            completed_today = cursor.fetchone()['count']
+            completed_today_results = cursor.fetchall()
             
             # Por urgência (apenas pendentes)
             cursor.execute("""
@@ -116,7 +116,7 @@ def get_dashboard_stats(current_user):
             
             return jsonify({
                 'pending': pending,
-                'completed_today': completed_today,
+                'completed_today': completed_today_results,
                 'urgency': {
                     'low': urgency.get('low', 0),
                     'medium': urgency.get('medium', 0),

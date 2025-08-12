@@ -1,5 +1,6 @@
 import os
 import sys
+from datetime import datetime
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
@@ -22,6 +23,10 @@ app.register_blueprint(tickets_bp, url_prefix='/api/tickets')
 app.register_blueprint(stats_bp, url_prefix='/api/stats')
 
 # Configuração do SQLite para autenticação
+# Criar diretório database se não existir
+database_dir = os.path.join(os.path.dirname(__file__), 'database')
+os.makedirs(database_dir, exist_ok=True)
+
 app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -35,6 +40,32 @@ app.config['POSTGRES_PASSWORD'] = os.environ.get('POSTGRES_PASSWORD', 'password'
 db.init_app(app)
 with app.app_context():
     db.create_all()
+
+# Endpoint de health check
+@app.route('/api/health')
+def health_check():
+    """Endpoint para verificar se a aplicação está funcionando"""
+    try:
+        # Testar conexão SQLite
+        with app.app_context():
+            db.session.execute('SELECT 1')
+        
+        # Testar conexão PostgreSQL
+        from src.models.postgres_connection import test_postgres_connection
+        postgres_ok = test_postgres_connection()
+        
+        return {
+            'status': 'healthy',
+            'sqlite': 'ok',
+            'postgresql': 'ok' if postgres_ok else 'error',
+            'timestamp': datetime.utcnow().isoformat()
+        }, 200
+    except Exception as e:
+        return {
+            'status': 'unhealthy',
+            'error': str(e),
+            'timestamp': datetime.utcnow().isoformat()
+        }, 500
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
@@ -54,5 +85,7 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    # Configuração para produção
+    debug_mode = os.environ.get('FLASK_ENV') == 'development'
+    app.run(host='0.0.0.0', port=5000, debug=debug_mode)
 

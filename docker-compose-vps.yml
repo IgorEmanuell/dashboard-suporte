@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # Aplicação Flask
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      # IMPORTANTE: Altere esta chave secreta para uma chave forte e única!
+      - SECRET_KEY=dashboard-suporte-2025-chave-super-secreta-mude-isso
+      
+      # Configurações do PostgreSQL (você precisa fornecer os dados reais)
+      - POSTGRES_HOST=localhost  # Altere para seu servidor PostgreSQL
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=dashboard_suporte
+      - POSTGRES_USER=postgres   # Altere para seu usuário
+      - POSTGRES_PASSWORD=sua_senha_aqui  # Altere para sua senha
+      
+      # Configurações da aplicação
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    volumes:
+      - ./src/database:/app/src/database # Para o SQLite de login (persistir dados de usuários)
+      - ./logs:/app/logs  # Para logs da aplicação
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Adminer para gerenciar bancos (OPCIONAL - para debug)
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+    profiles:
+      - admin # Use 'docker-compose -f docker-compose-vps.yml --profile admin up' para incluir
+
+networks:
+  dashboard-network:
+    driver: bridge
+
+# Para usar apenas a aplicação:
+# docker-compose -f docker-compose-vps.yml up -d app
+
+# Para usar com Adminer (ferramenta de gerenciamento):
+# docker-compose -f docker-compose-vps.yml --profile admin up -d

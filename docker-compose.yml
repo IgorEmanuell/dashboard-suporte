@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  # Aplicação Flask
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - SECRET_KEY=your-secret-key-change-in-production
+      - POSTGRES_HOST=postgres
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=dashboard_suporte
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    depends_on:
+      postgres:
+        condition: service_healthy
+    volumes:
+      - ./src/database:/app/src/database
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+
+  # Banco PostgreSQL para dados
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=dashboard_suporte
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres123
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sql:/docker-entrypoint-initdb.d/init-db.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+
+  # Adminer para gerenciar bancos (opcional)
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+
+volumes:
+  postgres_data:
+
+networks:
+  dashboard-network:
+    driver: bridge
+

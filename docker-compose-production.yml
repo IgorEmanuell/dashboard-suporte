@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Aplicação Flask
+  app:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      # IMPORTANTE: Altere esta chave secreta para uma chave forte e única em produção!
+      - SECRET_KEY=sua-chave-secreta-muito-forte-e-unica-aqui-mude-isso
+      
+      # Configurações do PostgreSQL (Supabase)
+      - POSTGRES_HOST=aws-0-sa-east-1.pooler.supabase.com
+      - POSTGRES_PORT=6543
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres.daxajqrcpearkcsheeol
+      - POSTGRES_PASSWORD=M@e92634664
+      
+      # Configurações da aplicação
+      - FLASK_ENV=production
+      - FLASK_DEBUG=0
+    volumes:
+      - ./src/database:/app/src/database # Para o SQLite de login (persistir dados de usuários)
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+    entrypoint: ["/usr/local/bin/docker-entrypoint.sh"]
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:5000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Adminer para gerenciar bancos (OPCIONAL - remova em produção se não precisar)
+  adminer:
+    image: adminer:latest
+    ports:
+      - "8080:8080"
+    environment:
+      ADMINER_DEFAULT_SERVER: aws-0-sa-east-1.pooler.supabase.com
+      ADMINER_DEFAULT_DB: postgres
+      ADMINER_DEFAULT_USER: postgres.daxajqrcpearkcsheeol
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - dashboard-network
+    profiles:
+      - admin # Use 'docker-compose --profile admin up' para incluir o Adminer
+
+networks:
+  dashboard-network:
+    driver: bridge
+
+# Para usar apenas a aplicação (sem Adminer):
+# docker-compose up -d app
+
+# Para usar com Adminer (ferramenta de gerenciamento de banco):
+# docker-compose --profile admin up -d
+
+

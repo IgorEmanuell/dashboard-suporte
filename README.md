@@ -53,6 +53,12 @@ POSTGRES_PASSWORD=sua_senha_segura
 ### 3. Executar o Sistema
 
 ```bash
+# Primeiro, construir o frontend
+cd frontend-src
+npm install
+npm run build
+cd ..
+
 # Construir e iniciar todos os serviços
 docker-compose up -d
 

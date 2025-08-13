@@ -18,6 +18,16 @@ COPY . .
 # Criar diretórios necessários
 RUN mkdir -p src/database logs
 
+# Instalar dependências do frontend e fazer build
+COPY frontend-src/package*.json ./frontend-src/
+RUN cd frontend-src && npm install
+
+# Copiar código fonte do frontend e fazer build
+COPY frontend-src/ ./frontend-src/
+RUN cd frontend-src && npm run build
+
+# Copiar arquivos buildados para o diretório static
+
 # Criar script de entrada simplificado para VPS
 RUN cat > /usr/local/bin/docker-entrypoint.sh << 'EOF' && chmod +x /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
@@ -60,5 +70,3 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["python", "src/main.py"]
-
-

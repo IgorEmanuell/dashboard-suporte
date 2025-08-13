@@ -24,6 +24,12 @@ Tudo já está configurado com seus dados reais do Supabase! Agora é só seguir
 
 ### 2.1 Comprimir o Projeto (na sua máquina local)
 ```bash
+# Construir frontend localmente (opcional, mas recomendado)
+cd frontend-src
+npm install
+npm run build
+cd ..
+
 # Comprimir todos os arquivos
 tar -czf dashboard-suporte.tar.gz .
 ```

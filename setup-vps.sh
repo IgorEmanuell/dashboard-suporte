@@ -65,6 +65,14 @@ mkdir -p ~/dashboard-suporte/logs
 mkdir -p ~/dashboard-suporte/src/database
 mkdir -p ~/dashboard-suporte/backup
 
+echo "🔧 Instalando dependências do frontend..."
+cd frontend-src
+npm install
+npm run build
+cd ..
+
+# Criar diretório static se não existir
+
 # Gerar chave secreta forte
 print_status "Gerando chave secreta..."
 SECRET_KEY=$(openssl rand -base64 32)

@@ -49,8 +49,8 @@ def create_ticket(current_user):
     try:
         data = request.get_json()
         
-        if not data or not all(k in data for k in ['type', 'description', 'requester']):
-            return jsonify({'message': 'Campos obrigatórios: type, description, requester'}), 400
+        if not data or not all(k in data for k in ['type', 'title', 'description', 'requester']):
+            return jsonify({'message': 'Campos obrigatórios: type, title, description, requester'}), 400
         
         with get_postgres_connection() as conn:
             cursor = conn.cursor()
@@ -63,13 +63,15 @@ def create_ticket(current_user):
             
             # Inserir novo ticket
             cursor.execute("""
-                INSERT INTO tickets (type_id, description, requester, urgency, status, created_by)
-                VALUES (%s, %s, %s, %s, 'pending', %s)
+                INSERT INTO tickets (type_id, title, description, requester, requester_email, urgency, status, created_by)
+                VALUES (%s, %s, %s, %s, %s, %s, 'pending', %s)
                 RETURNING *
             """, (
                 type_result['id'], 
+                data['title'],
                 data['description'], 
                 data['requester'], 
+                data.get('requester_email', ''),
                 data.get('urgency', 'medium'),
                 current_user.username
             ))
